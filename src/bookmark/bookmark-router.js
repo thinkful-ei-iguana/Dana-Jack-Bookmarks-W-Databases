@@ -1,15 +1,22 @@
+require('dotenv').config();
 const express = require('express');
 const uuid = require('uuid/v4');
 const logger = require('../logger');
-const bookmarks = require('../store');
+const bookmarks = require('../bookmarks-service');
+const knex = require('knex');
 const bodyParser = express.json();
 
 const bookmarkRouter = express.Router();
 
+const db = knex({
+  client: 'pg',
+  connection: process.env.DB_URL
+});
+
 bookmarkRouter
   .route('/bookmarks')
   .get((req, res) => {
-    res.json(bookmarks);
+    res.json(bookmarks.get(db));
   })
   .post(bodyParser, (req, res) => {
     const {
@@ -37,8 +44,9 @@ bookmarkRouter
   .route('/bookmarks/:id')
   .get((req, res) => {
     const { id } = req.params;
-    const bookmark = bookmarks.find(
-      bookmark => bookmark.id === id
+    const bookmark = bookmarks.getById(
+      db,
+      id
     );
     if (!bookmark) {
       logger.error(
