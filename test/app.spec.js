@@ -43,12 +43,24 @@ describe('bookmarks endpoints', () => {
     context(
       'Database has data within',
       () => {
+        afterEach(() => {
+          return db(
+            'bookmarks'
+          ).truncate();
+        });
         beforeEach(() => {
           db.insert(testBookmarks)
             .into('bookmarks')
-            .then(rows =>
-              console.log('rows:', rows)
-            );
+            .returning('*')
+            .then(function(rows) {
+              console.log(
+                'rows:',
+                rows
+              );
+            });
+          console.log(
+            'ljdlsfjlsdjflskjfsljf'
+          );
         });
         it('get all bookmarks', () => {
           return supertest(app)

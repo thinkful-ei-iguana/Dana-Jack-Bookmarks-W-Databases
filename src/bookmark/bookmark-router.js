@@ -8,16 +8,11 @@ const bodyParser = express.json();
 
 const bookmarkRouter = express.Router();
 
-const db = knex({
-  client: 'pg',
-  connection: process.env.DB_URL
-});
-
 bookmarkRouter
   .route('/bookmarks')
   .get((req, res) => {
     bookmarks
-      .get(db)
+      .get(req.app.get('db'))
       .then(data => res.json(data));
   })
   .post(bodyParser, (req, res) => {
@@ -47,7 +42,7 @@ bookmarkRouter
   .get((req, res) => {
     const { id } = req.params;
     bookmarks
-      .getById(db, id)
+      .getById(req.app.get('db'), id)
       .then(bookmark => {
         if (!bookmark) {
           logger.error(
